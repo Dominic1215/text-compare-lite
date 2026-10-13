@@ -12,7 +12,7 @@ import { detectMoves } from "./moves";
 import { compilePatterns, hasActiveOptions, ignorePresets, splitLines } from "./normalize";
 import { type Prefs, type ThemePref, loadDocs, loadPrefs, saveDocs, savePrefs } from "./prefs";
 import { buildReport } from "./report";
-import { decodeShare, encodeShare } from "./share";
+import { decodeShare } from "./share";
 import { renderChangeMap } from "./ui/changemap";
 import { renderDataPanel } from "./ui/datapanel";
 import { type ImageMode, ImagePanel } from "./ui/imagepanel";
@@ -23,8 +23,6 @@ import { LibraryUI } from "./ui/library-ui";
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const $$ = <T extends HTMLElement = HTMLElement>(sel: string) => Array.from(document.querySelectorAll<T>(sel));
 
-const LONG_LINK = 32 * 1024;
-const MAX_LINK = 2 * 1024 * 1024;
 const LARGE_FILE = 5 * 1024 * 1024;
 
 type Side = "a" | "b";
@@ -501,24 +499,6 @@ async function copyText(text: string, done: string) {
     ta.select();
   }
 }
-
-$("#share").addEventListener("click", async () => {
-  if (mode === "image") return toast("Images can't go in a link. Links carry text only.");
-  const a = editor.a, b = editor.b;
-  if (!a && !b) return toast("Add some text first, then copy a link to it.");
-  const hash = encodeShare({
-    l: a, r: b,
-    ln: nameA.value || undefined, rn: nameB.value || undefined,
-    lang: prefs.lang || undefined,
-    o: hasActiveOptions(prefs.options) ? prefs.options : undefined,
-    view: prefs.view,
-  });
-  const url = `${location.origin}${location.pathname}#${hash}`;
-  if (url.length > MAX_LINK) return toast("This text is too large to fit in a link. Download a report or .patch instead.", "error", 6000);
-  await copyText(url, url.length > LONG_LINK
-    ? `Link copied (${Math.round(url.length / 1024)} KB). Some apps cut off links this long.`
-    : "Link copied. The text travels inside the link; nothing is stored on a server.");
-});
 
 // ---------------------------------------------------------------- files: open, paste, drop
 

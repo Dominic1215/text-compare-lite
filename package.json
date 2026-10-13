@@ -36,10 +36,10 @@
   },
   "private": true,
   "funding": "https://buymeacoffee.com/Clayberd",
-  "homepage": "https://text.compare",
+  "homepage": "https://github.com/Dominic1215/text-compare-lite",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JamesClayPatton/text-compare-lite.git"
+    "url": "https://github.com/Dominic1215/text-compare-lite.git"
   },
   "engines": {
     "node": ">=22.12"

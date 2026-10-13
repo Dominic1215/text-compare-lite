@@ -49,8 +49,12 @@ test("renames and deletes saved comparisons", async ({ page }) => {
   await expect(page.locator(".library-empty")).toContainText("Nothing saved yet");
 });
 
-test("keeps a history of comparisons, which can be turned off", async ({ page }) => {
+test("keeps a history only when enabled, and can turn it off", async ({ page }) => {
   await page.goto("/");
+  await page.click("#options-btn");
+  await expect(page.locator("#opt-history")).not.toBeChecked();
+  await page.check("#opt-history");
+  await page.keyboard.press("Escape");
   await fill(page, "history left", "history right");
   await page.waitForTimeout(4600);
   await page.click("#library-btn");

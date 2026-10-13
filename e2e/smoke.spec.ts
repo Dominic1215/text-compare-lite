@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { encodeShare } from "../src/share";
 
 async function fill(page: Page, a: string, b: string) {
   const editors = page.locator(".cm-content");
@@ -42,20 +43,11 @@ test("unified view shows removed and added lines", async ({ page }) => {
   await expect(page.locator(".cm-content")).toContainText("new line");
 });
 
-test("copied link restores both texts", async ({ page, context }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+test("does not offer a link containing the compared text", async ({ page }) => {
   await page.goto("/");
   await fill(page, "left side ✓", "right side 👋");
-  await page.click("#share");
-  const url = await page.evaluate(() => navigator.clipboard.readText());
-  expect(url).toContain("#v1:");
-
-  const fresh = await context.newPage();
-  await fresh.goto(url);
-  const editors = fresh.locator(".cm-content");
-  await expect(editors.nth(0)).toHaveText("left side ✓");
-  await expect(editors.nth(1)).toHaveText("right side 👋");
-  expect(fresh.url()).not.toContain("#v1:");
+  await expect(page.locator("#share")).toHaveCount(0);
+  expect(new URL(page.url()).hash).toBe("");
 });
 
 test("a damaged link shows a message instead of breaking", async ({ page }) => {
@@ -76,21 +68,16 @@ test("makes no requests to other sites", async ({ page }) => {
   expect(external).toEqual([]);
 });
 
-test("share text is removed from the address bar before anything else runs", async ({ page, context }) => {
-  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+test("legacy share fragments are cleared from the address bar", async ({ page, context }) => {
+  // 兼容旧链接，但页面不再提供生成分享链接的入口。
+  const hash = "#" + encodeShare({ l: "private words", r: "other words" });
   await page.goto("/");
-  await fill(page, "private words", "other words");
-  await page.click("#share");
-  const url = await page.evaluate(() => navigator.clipboard.readText());
-  const hash = url.slice(url.indexOf("#"));
 
-  // opened fresh: the hash is gone as soon as the page runs
   const fresh = await context.newPage();
   await fresh.goto("/" + hash);
   expect(await fresh.evaluate(() => location.hash)).toBe("");
   await expect(fresh.locator(".cm-content").nth(0)).toHaveText("private words");
 
-  // pasted into a tab that already has the site open
   await fresh.locator(".cm-content").nth(0).click();
   await fresh.keyboard.press("Control+A");
   await fresh.keyboard.insertText("changed");

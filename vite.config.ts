@@ -3,9 +3,9 @@ import { join, resolve } from "node:path";
 import { type Plugin, defineConfig } from "vite";
 import { type Page, pageUrl, pages, renderAbout, renderHead } from "./site/pages";
 
-// Public address of the site, used for canonical links, the sitemap and share
-// previews. Set SITE_URL when building your own copy.
-const SITE_URL = (process.env.SITE_URL || "https://text.compare").replace(/\/$/, "");
+// 站点正式地址，用于生成 canonical、站点地图和社交预览。
+// 部署前在 Cloudflare Pages 设置 SITE_URL。
+const SITE_URL = (process.env.SITE_URL || process.env.CF_PAGES_URL || "https://text.compare").replace(/\/$/, "");
 
 function renderPage(html: string, page: Page, prefix: string): string {
   const config = JSON.stringify({ hint: page.hint, start: page.start ?? {} }).replace(/</g, "\\u003c");

@@ -26,7 +26,7 @@ export interface Page {
 
 const privacyFaq: PageFaq = {
   q: "Is my text uploaded anywhere?",
-  a: "Not to compare it. The comparison runs entirely in your browser, and the text you paste and the files you open are never sent to a server for that. There are no ads, no accounts and no analytics. If you copy a share link, the text is packed into the link itself, in the part after the # that is never sent to a server. Your history and saves stay in your browser.",
+  a: "Not to compare it. The comparison runs entirely in your browser. Text and files are not uploaded. There are no ads, accounts or analytics. History is off by default. You can opt in to local history or manually save comparisons in your browser; do not save sensitive secrets.",
 };
 
 const freeFaq: PageFaq = {
@@ -50,7 +50,7 @@ export const pages: Page[] = [
     steps: [
       "Paste the original text on the left and the changed text on the right, or drop two files onto the page.",
       "Differences appear straight away. Press F7 or use the arrows to step through each change.",
-      "Adjust what counts as a change in Options, then copy a link, download a .patch, or export a report.",
+      "Adjust what counts as a change in Options, then download a .patch or export a report.",
     ],
     faq: [
       privacyFaq,
@@ -236,7 +236,7 @@ export const pages: Page[] = [
     steps: [
       "Paste or drop the two versions of the file.",
       "Step through changes with F7, and use the arrows between the sides to merge blocks.",
-      "Download a .patch, copy the diff, or copy a link to share it.",
+      "Download a .patch or copy the diff to review the changes.",
     ],
     faq: [
       {

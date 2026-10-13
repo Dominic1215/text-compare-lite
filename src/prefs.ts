@@ -47,7 +47,7 @@ export const defaultPrefs: Prefs = {
   theme: "system",
   lang: "",
   remember: false,
-  history: true,
+  history: false,
 };
 
 function read(key: string): unknown {
@@ -83,7 +83,7 @@ export function loadPrefs(): Prefs {
     theme: v.theme === "light" || v.theme === "dark" ? v.theme : "system",
     lang: typeof v.lang === "string" ? v.lang : "",
     remember: v.remember === true,
-    history: v.history !== false,
+    history: v.history === true,
   };
 }
 
