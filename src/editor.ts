@@ -7,7 +7,7 @@ import {
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { ChangeSet, Compartment, EditorSelection, EditorState, type Extension, type StateCommand } from "@codemirror/state";
 import {
-  EditorView, drawSelection, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars,
+  EditorView, highlightActiveLine, highlightActiveLineGutter, highlightSpecialChars,
   keymap, lineNumbers, placeholder,
 } from "@codemirror/view";
 import { findLanguage } from "./lang";
@@ -266,7 +266,6 @@ export class DiffEditor {
       highlightActiveLineGutter(),
       highlightSpecialChars(),
       history(),
-      drawSelection(),
       indentOnInput(),
       bracketMatching(),
       highlightActiveLine(),

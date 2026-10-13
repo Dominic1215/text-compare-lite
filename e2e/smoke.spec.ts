@@ -25,6 +25,38 @@ test("merge arrow copies a block across", async ({ page }) => {
   await expect(page.locator("#summary")).toContainText("identical");
 });
 
+test("changed text supports mouse selection, copy, editing and paste", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/");
+  await fill(page, "CONFIG_KEY=abcdefghij", "CONFIG_KEY=1234567890");
+
+  const selectChangedText = async (side: "a" | "b") => {
+    const box = await page.locator(`.cm-merge-${side} .cm-changedText`).first().boundingBox();
+    expect(box).not.toBeNull();
+    const y = box!.y + box!.height / 2;
+    await page.mouse.move(box!.x + 2, y);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width - 2, y, { steps: 8 });
+    await page.mouse.up();
+    const selected = await page.evaluate(() => window.getSelection()?.toString() ?? "");
+    expect(selected.length).toBeGreaterThan(0);
+    return selected;
+  };
+
+  const copied = await selectChangedText("a");
+  await page.keyboard.press("ControlOrMeta+C");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(copied);
+
+  await page.keyboard.insertText("updated");
+  await expect(page.locator(".cm-content").first()).toContainText("updated");
+  await page.keyboard.press("ControlOrMeta+Z");
+  await expect(page.locator(".cm-content").first()).toContainText("abcdefghij");
+
+  await selectChangedText("b");
+  await page.keyboard.press("ControlOrMeta+V");
+  await expect(page.locator(".cm-content").nth(1)).toContainText(copied);
+});
+
 test("ignore case option hides case-only changes", async ({ page }) => {
   await page.goto("/");
   await fill(page, "Hello World", "hello world");
